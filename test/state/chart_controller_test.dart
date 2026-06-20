@@ -1,7 +1,6 @@
 import 'package:calculator2/ai/ai_commands.dart';
 import 'package:calculator2/data/repository/workspace_repository.dart';
 import 'package:calculator2/domain/model/element.dart';
-import 'package:calculator2/domain/model/element_id.dart';
 import 'package:calculator2/domain/model/workspace.dart';
 import 'package:calculator2/state/document_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
