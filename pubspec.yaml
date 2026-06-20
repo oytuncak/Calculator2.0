@@ -43,6 +43,8 @@ dependencies:
   excel: ^4.0.6
   # Cross-platform (incl. web) file save / download for exports.
   file_saver: ^0.2.14
+  # Pure-Dart charts for canvas chart elements (live-updating).
+  fl_chart: ^0.69.2
 
 dev_dependencies:
   flutter_test:

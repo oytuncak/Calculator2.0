@@ -17,9 +17,13 @@ isolation), text notes, basic arithmetic engine, `.calc2x` persistence, dark mod
 - _Next for export_: map the canvas spatially to cells and emit live spreadsheet
   formulas (`=B4*…`) for linked numbers (currently literal values).
 
-## M3 — Graphics
-- `ChartElement` rendered with `fl_chart`, subscribing to result providers so
-  charts update live as values cascade (line / bar / pie).
+## ✅ M3 — Graphics (shipped)
+- `ChartElement` rendered with `fl_chart` (bar / line / pie). A chart stores only
+  references to its source equations and reads their results at render time, so it
+  updates live as values cascade. Drop an equation's result pill onto a chart to add
+  a series; switch chart type inline. Charts move/persist like any element.
+- _Next for charts_: per-series labels/legend, axis ranges, and exporting charts
+  into the `.xlsx` (currently visual-only).
 
 ## M4 — Engine extension
 - Named **variables** and **scientific functions** (`sin`, `cos`, `sqrt`, `^`, …)

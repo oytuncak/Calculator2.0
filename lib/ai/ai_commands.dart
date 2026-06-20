@@ -1,3 +1,4 @@
+import '../domain/model/element.dart' show ChartType;
 import '../domain/model/element_id.dart';
 
 /// The single mutation vocabulary for the document.
@@ -63,4 +64,29 @@ class RenameCanvas extends DocumentCommand {
 class DeleteCanvas extends DocumentCommand {
   const DeleteCanvas(this.id);
   final ElementId id;
+}
+
+class AddChart extends DocumentCommand {
+  const AddChart({required this.x, required this.y});
+  final double x;
+  final double y;
+}
+
+/// Adds an equation as a data series on a chart.
+class AddChartSource extends DocumentCommand {
+  const AddChartSource({required this.chart, required this.source});
+  final ElementId chart;
+  final ElementId source;
+}
+
+class RemoveChartSource extends DocumentCommand {
+  const RemoveChartSource({required this.chart, required this.source});
+  final ElementId chart;
+  final ElementId source;
+}
+
+class SetChartType extends DocumentCommand {
+  const SetChartType(this.chart, this.chartType);
+  final ElementId chart;
+  final ChartType chartType;
 }

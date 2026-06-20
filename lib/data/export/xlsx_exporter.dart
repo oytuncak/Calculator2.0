@@ -35,6 +35,8 @@ class XlsxExporter {
 
     for (final element in canvas.elements) {
       switch (element) {
+        case ChartElement():
+          continue; // charts are visual-only; not exported to cells (yet)
         case TextElement():
           if (element.text.trim().isEmpty) continue;
           _setText(sheet, 0, row, element.text, bold: element.bold);
