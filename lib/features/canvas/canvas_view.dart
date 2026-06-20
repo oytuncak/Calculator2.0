@@ -8,6 +8,7 @@ import '../../domain/model/element.dart';
 import '../../domain/model/element_id.dart';
 import '../../state/document_controller.dart';
 import 'canvas_painters.dart';
+import 'element_widgets/chart_widget.dart';
 import 'element_widgets/equation_widget.dart';
 import 'element_widgets/text_widget.dart';
 
@@ -69,6 +70,11 @@ class _CanvasViewState extends ConsumerState<CanvasView> {
   void _addText() {
     final c = _sceneCenter();
     _controller.apply(AddText(x: c.dx - 110, y: c.dy - 20, text: ''));
+  }
+
+  void _addChart() {
+    final c = _sceneCenter();
+    _controller.apply(AddChart(x: c.dx - 150, y: c.dy - 120));
   }
 
   @override
@@ -141,6 +147,13 @@ class _CanvasViewState extends ConsumerState<CanvasView> {
             mainAxisSize: MainAxisSize.min,
             children: [
               FloatingActionButton.small(
+                heroTag: 'addChart',
+                tooltip: 'Add chart',
+                onPressed: _addChart,
+                child: const Icon(Icons.bar_chart),
+              ),
+              const SizedBox(height: 12),
+              FloatingActionButton.small(
                 heroTag: 'addText',
                 tooltip: 'Add text note',
                 onPressed: _addText,
@@ -172,6 +185,12 @@ class _CanvasViewState extends ConsumerState<CanvasView> {
       ),
       TextElement() => TextNoteWidget(
         element: element,
+        selected: selected,
+        scaleGetter: () => _scale,
+      ),
+      ChartElement() => ChartWidget(
+        element: element,
+        state: state,
         selected: selected,
         scaleGetter: () => _scale,
       ),

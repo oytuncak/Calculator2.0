@@ -101,6 +101,7 @@ class DocumentController extends StateNotifier<DocumentState> {
         final moved = switch (existing) {
           EquationElement() => existing.copyWith(x: x, y: y),
           TextElement() => existing.copyWith(x: x, y: y),
+          ChartElement() => existing.copyWith(x: x, y: y),
           null => null,
         };
         if (moved != null) _updateCanvas((c) => c.upsertElement(moved));
@@ -136,6 +137,35 @@ class DocumentController extends StateNotifier<DocumentState> {
         }
       case DeleteCanvas(:final id):
         _deleteCanvas(id);
+      case AddChart(:final x, :final y):
+        final el = ChartElement(id: ElementId.generate(), x: x, y: y);
+        _updateCanvas((c) => c.upsertElement(el), select: el.id);
+      case AddChartSource(:final chart, :final source):
+        final el = canvas.elementById(chart);
+        if (el is ChartElement && !el.sources.contains(source)) {
+          _updateCanvas(
+            (c) =>
+                c.upsertElement(el.copyWith(sources: [...el.sources, source])),
+          );
+        }
+      case RemoveChartSource(:final chart, :final source):
+        final el = canvas.elementById(chart);
+        if (el is ChartElement) {
+          _updateCanvas(
+            (c) => c.upsertElement(
+              el.copyWith(
+                sources: el.sources.where((s) => s != source).toList(),
+              ),
+            ),
+          );
+        }
+      case SetChartType(:final chart, :final chartType):
+        final el = canvas.elementById(chart);
+        if (el is ChartElement) {
+          _updateCanvas(
+            (c) => c.upsertElement(el.copyWith(chartType: chartType)),
+          );
+        }
     }
   }
 

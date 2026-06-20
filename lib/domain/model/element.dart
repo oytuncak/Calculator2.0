@@ -27,9 +27,20 @@ sealed class CanvasElement {
     return switch (type) {
       'equation' => EquationElement.fromJson(json),
       'text' => TextElement.fromJson(json),
+      'chart' => ChartElement.fromJson(json),
       _ => throw FormatException('Unknown element type "$type"'),
     };
   }
+}
+
+/// The kind of chart a [ChartElement] renders.
+enum ChartType {
+  bar,
+  line,
+  pie;
+
+  static ChartType fromName(String? name) =>
+      ChartType.values.firstWhere((t) => t.name == name, orElse: () => bar);
 }
 
 /// An equation the user types. [rawText] is the single source of truth; the
@@ -149,5 +160,71 @@ class TextElement extends CanvasElement {
     text: json['text'] as String? ?? '',
     fontSize: (json['fontSize'] as num?)?.toDouble() ?? 18,
     bold: json['bold'] as bool? ?? false,
+  );
+}
+
+/// A chart that plots the live results of one or more equations. The chart
+/// stores only references to its source equations (by id); the actual values
+/// are read from the recompute results at render time, so the chart updates
+/// live as the canvas cascades.
+class ChartElement extends CanvasElement {
+  const ChartElement({
+    required super.id,
+    required super.x,
+    required super.y,
+    super.width = 300,
+    super.height = 240,
+    this.title = 'Chart',
+    this.chartType = ChartType.bar,
+    this.sources = const [],
+  });
+
+  final String title;
+  final ChartType chartType;
+  final List<ElementId> sources;
+
+  ChartElement copyWith({
+    double? x,
+    double? y,
+    double? width,
+    double? height,
+    String? title,
+    ChartType? chartType,
+    List<ElementId>? sources,
+  }) => ChartElement(
+    id: id,
+    x: x ?? this.x,
+    y: y ?? this.y,
+    width: width ?? this.width,
+    height: height ?? this.height,
+    title: title ?? this.title,
+    chartType: chartType ?? this.chartType,
+    sources: sources ?? this.sources,
+  );
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'type': 'chart',
+    'id': id.value,
+    'x': x,
+    'y': y,
+    'width': width,
+    'height': height,
+    'title': title,
+    'chartType': chartType.name,
+    'sources': sources.map((s) => s.value).toList(),
+  };
+
+  static ChartElement fromJson(Map<String, dynamic> json) => ChartElement(
+    id: ElementId(json['id'] as String),
+    x: (json['x'] as num).toDouble(),
+    y: (json['y'] as num).toDouble(),
+    width: (json['width'] as num?)?.toDouble() ?? 300,
+    height: (json['height'] as num?)?.toDouble() ?? 240,
+    title: json['title'] as String? ?? 'Chart',
+    chartType: ChartType.fromName(json['chartType'] as String?),
+    sources: ((json['sources'] as List?) ?? const [])
+        .map((s) => ElementId(s as String))
+        .toList(),
   );
 }

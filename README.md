@@ -23,8 +23,12 @@ Built with **Flutter** (one codebase for iOS, Android, and web).
 - ✅ **Tabs** — multiple canvases per project, with add / rename / delete
 - ✅ **Excel export** — export the current canvas to a formatted `.xlsx` (web download / device share)
 
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (charts, scientific
-functions, and the AI / Claude-MCP layer).
+**Milestone 3 — charts/graphics**
+- ✅ **Chart elements** — bar / line / pie charts on the canvas; drop an equation's
+  result onto a chart to add it as a series, and the chart **updates live** as values cascade
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (scientific functions &
+variables, then the AI / Claude-MCP layer).
 
 ## Architecture
 
