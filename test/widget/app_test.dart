@@ -47,6 +47,33 @@ void main() {
     expect(find.byTooltip('Dark mode'), findsOneWidget);
   });
 
+  testWidgets('About dialog credits the developer as Gastronaut',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final repo = _MemoryRepository();
+    final initial = await DocumentController.bootstrap(repo);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          documentRepositoryProvider.overrideWithValue(repo),
+          documentControllerProvider
+              .overrideWith((ref) => DocumentController(repo, initial)),
+          settingsControllerProvider
+              .overrideWith((ref) => SettingsController(prefs)),
+        ],
+        child: const Calculator2App(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('About'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Developed by Gastronaut'), findsWidgets);
+  });
+
   testWidgets('editing a source equation cascades to its dependent',
       (tester) async {
     SharedPreferences.setMockInitialValues({});

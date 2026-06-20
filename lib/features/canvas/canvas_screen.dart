@@ -40,10 +40,30 @@ class CanvasScreen extends ConsumerWidget {
             onPressed: () =>
                 ref.read(settingsControllerProvider.notifier).toggleDark(),
           ),
+          IconButton(
+            tooltip: 'About',
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => _showAbout(context),
+          ),
           const SizedBox(width: 8),
         ],
       ),
       body: const CanvasView(),
+    );
+  }
+
+  void _showAbout(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationName: 'Calculator 2.0',
+      applicationVersion: 'Milestone 1',
+      applicationLegalese: 'Developed by Gastronaut',
+      children: const [
+        SizedBox(height: 12),
+        Text('A canvas calculator with live, linked results.'),
+        SizedBox(height: 8),
+        Text('Developed by Gastronaut'),
+      ],
     );
   }
 }

@@ -50,3 +50,7 @@ flutter run                  # run on a connected device / simulator
 
 > iOS/Android release packaging needs a Mac or a cloud build service
 > (e.g. Codemagic); all logic and UI are verifiable via the web build.
+
+## Credits
+
+Developed by **Gastronaut**.
