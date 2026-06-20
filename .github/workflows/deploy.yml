@@ -39,6 +39,9 @@ jobs:
         run: flutter build web --release --base-href "/Calculator2.0/"
 
       - uses: actions/configure-pages@v5
+        with:
+          # Enable Pages automatically (no need to set the source manually).
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
