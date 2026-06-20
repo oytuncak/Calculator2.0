@@ -19,9 +19,9 @@ sealed class CellValue {
 
   /// The numeric value if this is a [NumberValue], otherwise null.
   double? get asDouble => switch (this) {
-        NumberValue(:final value) => value,
-        _ => null,
-      };
+    NumberValue(:final value) => value,
+    _ => null,
+  };
 }
 
 class NumberValue extends CellValue {
@@ -57,8 +57,7 @@ class ErrorValue extends CellValue {
   final EvalError error;
 
   @override
-  bool operator ==(Object other) =>
-      other is ErrorValue && other.error == error;
+  bool operator ==(Object other) => other is ErrorValue && other.error == error;
 
   @override
   int get hashCode => error.hashCode;

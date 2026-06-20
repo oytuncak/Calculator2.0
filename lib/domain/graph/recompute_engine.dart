@@ -51,10 +51,9 @@ class RecomputeEngine {
       try {
         final expr = Parser.fromSource(raw).parse();
         asts[entry.key] = expr;
-        final refs = collectReferences(expr)
-            .map(ElementId.new)
-            .where(equations.containsKey)
-            .toSet();
+        final refs = collectReferences(
+          expr,
+        ).map(ElementId.new).where(equations.containsKey).toSet();
         graph.setDependencies(entry.key, refs);
       } on EvalError catch (e) {
         values[entry.key] = ErrorValue(e);
@@ -91,9 +90,7 @@ class _MapEvalContext implements EvalContext {
   CellValue resolveReference(String elementId) {
     final id = ElementId(elementId);
     if (!_known.contains(id)) {
-      return ErrorValue(
-        EvalError.unknownReference('No element "@$elementId"'),
-      );
+      return ErrorValue(EvalError.unknownReference('No element "@$elementId"'));
     }
     return _values[id] ?? const EmptyValue();
   }

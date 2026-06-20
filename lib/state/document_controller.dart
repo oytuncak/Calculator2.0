@@ -1,88 +1,100 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../ai/ai_commands.dart';
-import '../data/repository/document_repository.dart';
+import '../data/repository/workspace_repository.dart';
 import '../domain/graph/recompute_engine.dart';
 import '../domain/model/canvas_doc.dart';
 import '../domain/model/cell_value.dart';
 import '../domain/model/element.dart';
 import '../domain/model/element_id.dart';
 import '../domain/model/project.dart';
-import '../domain/serialization/document_codec.dart';
+import '../domain/model/workspace.dart';
+import '../domain/serialization/workspace_codec.dart';
 
-/// Immutable snapshot of the editor: the project, which canvas is active, the
-/// live computed results for that canvas, and the current selection.
+/// Immutable snapshot of the editor: the workspace (all projects), the live
+/// computed results for the current canvas, and the current selection.
 class DocumentState {
   const DocumentState({
-    required this.project,
-    required this.currentCanvasId,
+    required this.workspace,
     required this.results,
     this.selectedId,
   });
 
-  final Project project;
-  final ElementId currentCanvasId;
+  final Workspace workspace;
   final RecomputeResult results;
   final ElementId? selectedId;
 
-  CanvasDoc get canvas => project.canvasById(currentCanvasId)!;
+  Project get project => workspace.currentProject;
+
+  CanvasDoc get canvas =>
+      project.canvasById(workspace.currentCanvasId) ?? project.canvases.first;
+
+  ElementId get currentCanvasId => canvas.id;
 
   CellValue valueFor(ElementId id) => results.valueFor(id);
 
   DocumentState copyWith({
-    Project? project,
-    ElementId? currentCanvasId,
+    Workspace? workspace,
     RecomputeResult? results,
     ElementId? selectedId,
     bool clearSelection = false,
-  }) =>
-      DocumentState(
-        project: project ?? this.project,
-        currentCanvasId: currentCanvasId ?? this.currentCanvasId,
-        results: results ?? this.results,
-        selectedId: clearSelection ? null : (selectedId ?? this.selectedId),
-      );
+  }) => DocumentState(
+    workspace: workspace ?? this.workspace,
+    results: results ?? this.results,
+    selectedId: clearSelection ? null : (selectedId ?? this.selectedId),
+  );
 }
 
-/// Owns the document. Every mutation flows through [apply] so the UI and a
-/// future AI/MCP layer share one path and recompute identically.
+/// Owns the workspace. Element/canvas mutations flow through [apply] (the
+/// command bus shared with the future AI/MCP layer); project- and view-level
+/// operations are dedicated methods.
 class DocumentController extends StateNotifier<DocumentState> {
   DocumentController(this._repository, DocumentState initial) : super(initial);
 
-  final DocumentRepository _repository;
+  final WorkspaceRepository _repository;
   final _engine = RecomputeEngine();
 
-  /// Builds the starting state, loading any saved document or seeding a fresh
-  /// welcome canvas.
-  static Future<DocumentState> bootstrap(DocumentRepository repository) async {
-    final loaded = await repository.load();
-    final project = loaded ?? _seedProject();
-    final canvas = project.canvases.first;
+  static Future<DocumentState> bootstrap(WorkspaceRepository repository) async {
+    final workspace = await repository.load() ?? _seedWorkspace();
     return DocumentState(
-      project: project,
-      currentCanvasId: canvas.id,
-      results: RecomputeEngine().compute(canvas),
+      workspace: workspace,
+      results: RecomputeEngine().compute(
+        workspace.currentProject.canvasById(workspace.currentCanvasId) ??
+            workspace.currentProject.canvases.first,
+      ),
     );
   }
 
-  // --- command bus ---
+  // --- command bus (element + canvas ops on the current project/canvas) ---
 
   void apply(DocumentCommand command) {
     switch (command) {
       case AddEquation(:final x, :final y, :final rawText):
         final el = EquationElement(
-            id: ElementId.generate(), x: x, y: y, rawText: rawText);
-        _mutateCanvas((c) => c.upsertElement(el), select: el.id);
+          id: ElementId.generate(),
+          x: x,
+          y: y,
+          rawText: rawText,
+        );
+        _updateCanvas((c) => c.upsertElement(el), select: el.id);
       case AddText(:final x, :final y, :final text):
-        final el =
-            TextElement(id: ElementId.generate(), x: x, y: y, text: text);
-        _mutateCanvas((c) => c.upsertElement(el), select: el.id);
+        final el = TextElement(
+          id: ElementId.generate(),
+          x: x,
+          y: y,
+          text: text,
+        );
+        _updateCanvas((c) => c.upsertElement(el), select: el.id);
       case EditElement(:final id, :final rawText):
         final existing = canvas.elementById(id);
         if (existing is EquationElement) {
-          _mutateCanvas((c) => c.upsertElement(existing.copyWith(rawText: rawText)));
+          _updateCanvas(
+            (c) => c.upsertElement(existing.copyWith(rawText: rawText)),
+          );
         } else if (existing is TextElement) {
-          _mutateCanvas((c) => c.upsertElement(existing.copyWith(text: rawText)));
+          _updateCanvas(
+            (c) => c.upsertElement(existing.copyWith(text: rawText)),
+          );
         }
       case MoveElement(:final id, :final x, :final y):
         final existing = canvas.elementById(id);
@@ -91,44 +103,130 @@ class DocumentController extends StateNotifier<DocumentState> {
           TextElement() => existing.copyWith(x: x, y: y),
           null => null,
         };
-        if (moved != null) _mutateCanvas((c) => c.upsertElement(moved));
+        if (moved != null) _updateCanvas((c) => c.upsertElement(moved));
       case LinkElements(:final source, :final target):
         final src = canvas.elementById(source);
         if (src is EquationElement) {
           final sep = src.rawText.trim().isEmpty ? '' : ' ';
-          _mutateCanvas((c) => c.upsertElement(
-              src.copyWith(rawText: '${src.rawText}$sep@${target.value}')));
+          _updateCanvas(
+            (c) => c.upsertElement(
+              src.copyWith(rawText: '${src.rawText}$sep@${target.value}'),
+            ),
+          );
         }
       case DeleteElement(:final id):
-        _mutateCanvas((c) => c.removeElement(id), clearSelection: true);
+        _updateCanvas((c) => c.removeElement(id), clearSelection: true);
       case CreateCanvas(:final name):
         final doc = CanvasDoc(id: ElementId.generate(), name: name);
-        final next = project.upsertCanvas(doc);
-        _commit(next, currentCanvasId: doc.id, clearSelection: true);
+        final nextProject = project.upsertCanvas(doc);
+        _commit(
+          workspace
+              .upsertProject(nextProject)
+              .copyWith(currentCanvasId: doc.id),
+          clearSelection: true,
+        );
+      case RenameCanvas(:final id, :final name):
+        final target = project.canvasById(id);
+        if (target != null) {
+          _commit(
+            workspace.upsertProject(
+              project.upsertCanvas(target.copyWith(name: name)),
+            ),
+          );
+        }
+      case DeleteCanvas(:final id):
+        _deleteCanvas(id);
     }
   }
 
   CanvasDoc get canvas => state.canvas;
+  Project get project => state.project;
+  Workspace get workspace => state.workspace;
 
   void select(ElementId? id) =>
       state = state.copyWith(selectedId: id, clearSelection: id == null);
 
-  void updateView(CanvasViewState view) {
-    _mutateCanvas((c) => c.copyWith(view: view), recompute: false);
+  void updateView(CanvasViewState view) =>
+      _updateCanvas((c) => c.copyWith(view: view), recompute: false);
+
+  // --- canvas / project navigation (UI-level) ---
+
+  void switchCanvas(ElementId id) {
+    if (project.canvasById(id) == null) return;
+    _commit(workspace.copyWith(currentCanvasId: id), clearSelection: true);
+  }
+
+  void switchProject(ElementId id) {
+    final p = workspace.projectById(id);
+    if (p == null) return;
+    _commit(
+      workspace.copyWith(
+        currentProjectId: id,
+        currentCanvasId: p.canvases.first.id,
+      ),
+      clearSelection: true,
+    );
+  }
+
+  void createProject(String name) {
+    final canvasId = ElementId.generate();
+    final p = Project(
+      id: ElementId.generate(),
+      name: name,
+      canvases: [CanvasDoc(id: canvasId, name: 'Canvas 1')],
+    );
+    _commit(
+      workspace
+          .upsertProject(p)
+          .copyWith(currentProjectId: p.id, currentCanvasId: canvasId),
+      clearSelection: true,
+    );
+  }
+
+  void renameProject(ElementId id, String name) {
+    final p = workspace.projectById(id);
+    if (p == null) return;
+    _commit(workspace.upsertProject(p.copyWith(name: name)));
+  }
+
+  void deleteProject(ElementId id) {
+    if (workspace.projects.length <= 1) return; // keep at least one project
+    var next = workspace.removeProject(id);
+    if (id == workspace.currentProjectId) {
+      final p = next.projects.first;
+      next = next.copyWith(
+        currentProjectId: p.id,
+        currentCanvasId: p.canvases.first.id,
+      );
+    }
+    _commit(next, clearSelection: true);
   }
 
   // --- internals ---
 
-  void _mutateCanvas(
+  void _deleteCanvas(ElementId id) {
+    if (project.canvases.length <= 1) return; // keep at least one canvas
+    final remaining = project.canvases.where((c) => c.id != id).toList();
+    final nextProject = project.copyWith(canvases: remaining);
+    var next = workspace.upsertProject(nextProject);
+    if (id == workspace.currentCanvasId) {
+      next = next.copyWith(currentCanvasId: remaining.first.id);
+    }
+    _commit(next, clearSelection: true);
+  }
+
+  void _updateCanvas(
     CanvasDoc Function(CanvasDoc) transform, {
     ElementId? select,
     bool clearSelection = false,
     bool recompute = true,
   }) {
     final updated = transform(canvas);
-    final nextProject = project.upsertCanvas(updated);
+    final nextWorkspace = workspace.upsertProject(
+      project.upsertCanvas(updated),
+    );
     _commit(
-      nextProject,
+      nextWorkspace,
       results: recompute ? _engine.compute(updated) : null,
       select: select,
       clearSelection: clearSelection,
@@ -136,67 +234,70 @@ class DocumentController extends StateNotifier<DocumentState> {
   }
 
   void _commit(
-    Project nextProject, {
-    ElementId? currentCanvasId,
+    Workspace nextWorkspace, {
     RecomputeResult? results,
     ElementId? select,
     bool clearSelection = false,
   }) {
-    final canvasId = currentCanvasId ?? state.currentCanvasId;
+    final canvas =
+        nextWorkspace.currentProject.canvasById(
+          nextWorkspace.currentCanvasId,
+        ) ??
+        nextWorkspace.currentProject.canvases.first;
     state = DocumentState(
-      project: nextProject,
-      currentCanvasId: canvasId,
-      results: results ??
-          (currentCanvasId != null
-              ? _engine.compute(nextProject.canvasById(canvasId)!)
-              : state.results),
+      workspace: nextWorkspace,
+      results: results ?? _engine.compute(canvas),
       selectedId: clearSelection ? null : (select ?? state.selectedId),
     );
-    _repository.save(nextProject);
+    _repository.save(nextWorkspace);
   }
 
-  Project get project => state.project;
-
-  static Project _seedProject() {
+  static Workspace _seedWorkspace() {
     final canvasId = ElementId.generate();
     final a = EquationElement(
-        id: ElementId.generate(), x: 60, y: 120, rawText: '120 * 3');
+      id: ElementId.generate(),
+      x: 60,
+      y: 120,
+      rawText: '120 * 3',
+    );
     final b = EquationElement(
-        id: ElementId.generate(),
-        x: 60,
-        y: 210,
-        rawText: '@${a.id.value} + 50');
+      id: ElementId.generate(),
+      x: 60,
+      y: 210,
+      rawText: '@${a.id.value} + 50',
+    );
     final title = TextElement(
-        id: ElementId.generate(),
-        x: 60,
-        y: 56,
-        text: 'Welcome to Calculator 2.0',
-        fontSize: 22,
-        bold: true);
-    return Project(
+      id: ElementId.generate(),
+      x: 60,
+      y: 56,
+      text: 'Welcome to Calculator 2.0',
+      fontSize: 22,
+      bold: true,
+    );
+    final project = Project(
       id: ElementId.generate(),
       name: 'My Project',
       canvases: [
-        CanvasDoc(
-          id: canvasId,
-          name: 'Canvas 1',
-          elements: [title, a, b],
-        ),
+        CanvasDoc(id: canvasId, name: 'Canvas 1', elements: [title, a, b]),
       ],
+    );
+    return Workspace(
+      projects: [project],
+      currentProjectId: project.id,
+      currentCanvasId: canvasId,
     );
   }
 }
 
-/// Provider scaffolding. [documentRepositoryProvider] and
-/// [documentControllerProvider] are overridden in `main()` once the repository
-/// and bootstrap state are ready.
-final documentRepositoryProvider = Provider<DocumentRepository>(
-  (ref) => SharedPrefsDocumentRepository(DocumentCodec()),
+/// Provider scaffolding. Both providers are overridden in `main()` once the
+/// repository and bootstrap state are ready.
+final workspaceRepositoryProvider = Provider<WorkspaceRepository>(
+  (ref) => SharedPrefsWorkspaceRepository(WorkspaceCodec()),
 );
 
 final documentControllerProvider =
     StateNotifierProvider<DocumentController, DocumentState>(
-  (ref) => throw UnimplementedError(
-    'documentControllerProvider must be overridden in main()',
-  ),
-);
+      (ref) => throw UnimplementedError(
+        'documentControllerProvider must be overridden in main()',
+      ),
+    );

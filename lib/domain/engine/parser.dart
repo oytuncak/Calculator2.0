@@ -18,8 +18,7 @@ import 'token.dart';
 class Parser {
   Parser(this._tokens);
 
-  factory Parser.fromSource(String source) =>
-      Parser(Lexer(source).tokenize());
+  factory Parser.fromSource(String source) => Parser(Lexer(source).tokenize());
 
   final List<Token> _tokens;
   int _pos = 0;

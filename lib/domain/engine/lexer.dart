@@ -111,7 +111,8 @@ class Lexer {
   bool get _isAtEnd => _pos >= _source.length;
   String _peek() => _source[_pos];
 
-  static bool _isDigit(String c) => c.codeUnitAt(0) >= 48 && c.codeUnitAt(0) <= 57;
+  static bool _isDigit(String c) =>
+      c.codeUnitAt(0) >= 48 && c.codeUnitAt(0) <= 57;
   static bool _isLetter(String c) {
     final u = c.codeUnitAt(0);
     return (u >= 65 && u <= 90) || (u >= 97 && u <= 122);

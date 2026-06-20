@@ -7,13 +7,15 @@ the architecture below is already seamed for everything that follows.
 Infinite canvas, live results, linked/referenced numbers (cascade + cycle
 isolation), text notes, basic arithmetic engine, `.calc2x` persistence, dark mode.
 
-## M2 — Structure & export
-- **Projects → Tabs hierarchy**: a Projects browser; each project holds multiple
-  named canvases shown as tabs. (`Project`/`CanvasDoc` already model this.)
-- Native file persistence via `path_provider` alongside the current storage.
-- **Excel (`.xlsx`) export** with labels & formatting (`excel` package).
-  Linked numbers become live spreadsheet formulas (`=B4*…`) where the layout maps
-  cleanly to cells; text elements become label cells.
+## ✅ M2 — Structure & export (shipped)
+- **Projects** browser (side drawer): create / switch / rename / delete; the
+  workspace persists all projects and the open project/canvas.
+- **Tabs**: multiple named canvases per project (add / rename / delete / switch).
+- **Excel (`.xlsx`) export** with labelled rows & bold headers (`excel` package,
+  pure Dart); `@id` references rewritten to readable names; web download / device
+  share via `file_saver`.
+- _Next for export_: map the canvas spatially to cells and emit live spreadsheet
+  formulas (`=B4*…`) for linked numbers (currently literal values).
 
 ## M3 — Graphics
 - `ChartElement` rendered with `fl_chart`, subscribing to result providers so

@@ -8,7 +8,11 @@ CellValue eval(String src) => evaluateSource(src);
 
 double number(String src) {
   final v = eval(src);
-  expect(v, isA<NumberValue>(), reason: 'expected a number for "$src" but got $v');
+  expect(
+    v,
+    isA<NumberValue>(),
+    reason: 'expected a number for "$src" but got $v',
+  );
   return (v as NumberValue).value;
 }
 

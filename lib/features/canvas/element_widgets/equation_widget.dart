@@ -31,8 +31,9 @@ class EquationWidget extends ConsumerStatefulWidget {
 }
 
 class _EquationWidgetState extends ConsumerState<EquationWidget> {
-  late final TextEditingController _text =
-      TextEditingController(text: widget.element.rawText);
+  late final TextEditingController _text = TextEditingController(
+    text: widget.element.rawText,
+  );
   final _focus = FocusNode();
 
   @override
@@ -89,13 +90,15 @@ class _EquationWidgetState extends ConsumerState<EquationWidget> {
                       controller: _text,
                       focusNode: _focus,
                       style: const TextStyle(
-                          fontFamily: 'monospace', fontSize: 16),
+                        fontFamily: 'monospace',
+                        fontSize: 16,
+                      ),
                       decoration: const InputDecoration(
                         hintText: 'type an expression…',
                         contentPadding: EdgeInsets.symmetric(vertical: 4),
                       ),
-                      onChanged: (t) => _controller
-                          .apply(EditElement(widget.element.id, t)),
+                      onChanged: (t) =>
+                          _controller.apply(EditElement(widget.element.id, t)),
                     ),
                     const SizedBox(height: 6),
                     _resultRow(scheme),
@@ -117,19 +120,23 @@ class _EquationWidgetState extends ConsumerState<EquationWidget> {
           behavior: HitTestBehavior.opaque,
           onPanUpdate: (d) {
             final s = widget.scaleGetter();
-            _controller.apply(MoveElement(
-              widget.element.id,
-              widget.element.x + d.delta.dx / s,
-              widget.element.y + d.delta.dy / s,
-            ));
+            _controller.apply(
+              MoveElement(
+                widget.element.id,
+                widget.element.x + d.delta.dx / s,
+                widget.element.y + d.delta.dy / s,
+              ),
+            );
           },
-          child: Icon(Icons.drag_indicator,
-              size: 18, color: scheme.onSurfaceVariant),
+          child: Icon(
+            Icons.drag_indicator,
+            size: 18,
+            color: scheme.onSurfaceVariant,
+          ),
         ),
         const Spacer(),
         InkWell(
-          onTap: () =>
-              _controller.apply(DeleteElement(widget.element.id)),
+          onTap: () => _controller.apply(DeleteElement(widget.element.id)),
           child: Icon(Icons.close, size: 16, color: scheme.onSurfaceVariant),
         ),
       ],
@@ -142,9 +149,7 @@ class _EquationWidgetState extends ConsumerState<EquationWidget> {
     final pill = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isError
-            ? scheme.errorContainer
-            : scheme.secondaryContainer,
+        color: isError ? scheme.errorContainer : scheme.secondaryContainer,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -152,7 +157,9 @@ class _EquationWidgetState extends ConsumerState<EquationWidget> {
         style: TextStyle(
           fontFamily: 'monospace',
           fontWeight: FontWeight.w600,
-          color: isError ? scheme.onErrorContainer : scheme.onSecondaryContainer,
+          color: isError
+              ? scheme.onErrorContainer
+              : scheme.onSecondaryContainer,
         ),
       ),
     );

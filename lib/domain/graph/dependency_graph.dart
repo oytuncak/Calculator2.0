@@ -24,8 +24,7 @@ class DependencyGraph {
     _dependsOn[id] = {...deps};
   }
 
-  Set<ElementId> dependenciesOf(ElementId id) =>
-      _dependsOn[id] ?? const {};
+  Set<ElementId> dependenciesOf(ElementId id) => _dependsOn[id] ?? const {};
 
   /// Elements that directly depend on [id] (its dependents), restricted to
   /// the known node set.

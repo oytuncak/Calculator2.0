@@ -31,18 +31,16 @@ class EvalError implements Exception {
   final EvalErrorKind kind;
   final String message;
 
-  const EvalError.syntax(String message)
-      : this(EvalErrorKind.syntax, message);
+  const EvalError.syntax(String message) : this(EvalErrorKind.syntax, message);
   const EvalError.divideByZero()
-      : this(EvalErrorKind.divideByZero, 'Division by zero');
+    : this(EvalErrorKind.divideByZero, 'Division by zero');
   const EvalError.unknownReference(String message)
-      : this(EvalErrorKind.unknownReference, message);
+    : this(EvalErrorKind.unknownReference, message);
   const EvalError.referenceError(String message)
-      : this(EvalErrorKind.referenceError, message);
+    : this(EvalErrorKind.referenceError, message);
   const EvalError.circularReference()
-      : this(EvalErrorKind.circularReference, 'Circular reference');
-  const EvalError.notANumber()
-      : this(EvalErrorKind.notANumber, 'Not a number');
+    : this(EvalErrorKind.circularReference, 'Circular reference');
+  const EvalError.notANumber() : this(EvalErrorKind.notANumber, 'Not a number');
 
   @override
   String toString() => 'EvalError(${kind.name}: $message)';

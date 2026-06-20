@@ -49,11 +49,9 @@ class _CanvasViewState extends ConsumerState<CanvasView> {
   void _persistView() {
     final m = _transform.value;
     final t = m.getTranslation();
-    _controller.updateView(CanvasViewState(
-      offsetX: t.x,
-      offsetY: t.y,
-      scale: m.getMaxScaleOnAxis(),
-    ));
+    _controller.updateView(
+      CanvasViewState(offsetX: t.x, offsetY: t.y, scale: m.getMaxScaleOnAxis()),
+    );
   }
 
   Offset _sceneCenter() {
@@ -107,7 +105,9 @@ class _CanvasViewState extends ConsumerState<CanvasView> {
                         behavior: HitTestBehavior.translucent,
                         onTap: () => _controller.select(null),
                         child: CustomPaint(
-                          painter: GridPainter(color: AppTheme.gridLine(context)),
+                          painter: GridPainter(
+                            color: AppTheme.gridLine(context),
+                          ),
                         ),
                       ),
                     ),
@@ -165,16 +165,16 @@ class _CanvasViewState extends ConsumerState<CanvasView> {
     final selected = state.selectedId == element.id;
     return switch (element) {
       EquationElement() => EquationWidget(
-          element: element,
-          value: state.valueFor(element.id),
-          selected: selected,
-          scaleGetter: () => _scale,
-        ),
+        element: element,
+        value: state.valueFor(element.id),
+        selected: selected,
+        scaleGetter: () => _scale,
+      ),
       TextElement() => TextNoteWidget(
-          element: element,
-          selected: selected,
-          scaleGetter: () => _scale,
-        ),
+        element: element,
+        selected: selected,
+        scaleGetter: () => _scale,
+      ),
     };
   }
 }

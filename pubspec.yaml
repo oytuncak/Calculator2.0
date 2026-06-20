@@ -39,6 +39,10 @@ dependencies:
   flutter_riverpod: ^2.6.1
   # Local persistence of settings and the web verification build's documents.
   shared_preferences: ^2.3.3
+  # Pure-Dart .xlsx generation for canvas export (no native deps).
+  excel: ^4.0.6
+  # Cross-platform (incl. web) file save / download for exports.
+  file_saver: ^0.2.14
 
 dev_dependencies:
   flutter_test:
