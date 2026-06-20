@@ -24,18 +24,13 @@ class GridPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(GridPainter old) =>
-      old.color != color || old.step != step;
+  bool shouldRepaint(GridPainter old) => old.color != color || old.step != step;
 }
 
 /// Draws connector lines between linked equations (dependent -> dependency)
 /// so the cascade is visible at a glance.
 class LinkPainter extends CustomPainter {
-  LinkPainter({
-    required this.bounds,
-    required this.graph,
-    required this.color,
-  });
+  LinkPainter({required this.bounds, required this.graph, required this.color});
 
   /// Canvas-space rectangle for each element.
   final Map<ElementId, Rect> bounds;
@@ -61,9 +56,12 @@ class LinkPainter extends CustomPainter {
         final path = Path()
           ..moveTo(start.dx, start.dy)
           ..cubicTo(
-            start.dx - 40, start.dy,
-            end.dx + 40, end.dy,
-            end.dx, end.dy,
+            start.dx - 40,
+            start.dy,
+            end.dx + 40,
+            end.dy,
+            end.dx,
+            end.dy,
           );
         canvas.drawPath(path, paint);
         canvas.drawCircle(end, 3, dotPaint);

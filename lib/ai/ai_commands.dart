@@ -53,3 +53,14 @@ class CreateCanvas extends DocumentCommand {
   const CreateCanvas(this.name);
   final String name;
 }
+
+class RenameCanvas extends DocumentCommand {
+  const RenameCanvas(this.id, this.name);
+  final ElementId id;
+  final String name;
+}
+
+class DeleteCanvas extends DocumentCommand {
+  const DeleteCanvas(this.id);
+  final ElementId id;
+}

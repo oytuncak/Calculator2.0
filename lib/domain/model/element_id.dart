@@ -20,8 +20,7 @@ class ElementId {
   }
 
   @override
-  bool operator ==(Object other) =>
-      other is ElementId && other.value == value;
+  bool operator ==(Object other) => other is ElementId && other.value == value;
 
   @override
   int get hashCode => value.hashCode;

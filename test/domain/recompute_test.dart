@@ -26,35 +26,33 @@ void main() {
 
   test('linked numbers cascade in dependency order', () {
     // b references a; c references b. Edit propagates down the chain.
-    final r = engine.compute(docWith([
-      eq('a', '10'),
-      eq('b', '@a * 2'),
-      eq('c', '@b + 5'),
-    ]));
+    final r = engine.compute(
+      docWith([eq('a', '10'), eq('b', '@a * 2'), eq('c', '@b + 5')]),
+    );
     expect(valueOf(r, 'a'), 10);
     expect(valueOf(r, 'b'), 20);
     expect(valueOf(r, 'c'), 25);
   });
 
   test('editing a source recomputes all dependents', () {
-    final r = engine.compute(docWith([
-      eq('a', '7'),
-      eq('b', '@a + 1'),
-      eq('c', '@b + 1'),
-    ]));
+    final r = engine.compute(
+      docWith([eq('a', '7'), eq('b', '@a + 1'), eq('c', '@b + 1')]),
+    );
     expect(valueOf(r, 'c'), 9);
   });
 
   test('circular reference is isolated, not fatal', () {
-    final r = engine.compute(docWith([
-      eq('a', '@b + 1'),
-      eq('b', '@a + 1'),
-      eq('ok', '3 + 4'),
-    ]));
-    expect((r.valueFor(ElementId('a')) as ErrorValue).error.kind,
-        EvalErrorKind.circularReference);
-    expect((r.valueFor(ElementId('b')) as ErrorValue).error.kind,
-        EvalErrorKind.circularReference);
+    final r = engine.compute(
+      docWith([eq('a', '@b + 1'), eq('b', '@a + 1'), eq('ok', '3 + 4')]),
+    );
+    expect(
+      (r.valueFor(ElementId('a')) as ErrorValue).error.kind,
+      EvalErrorKind.circularReference,
+    );
+    expect(
+      (r.valueFor(ElementId('b')) as ErrorValue).error.kind,
+      EvalErrorKind.circularReference,
+    );
     // Unrelated equation still computes.
     expect(valueOf(r, 'ok'), 7);
   });

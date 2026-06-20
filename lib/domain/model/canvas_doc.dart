@@ -16,14 +16,17 @@ class CanvasViewState {
         scale: scale ?? this.scale,
       );
 
-  Map<String, dynamic> toJson() =>
-      {'offsetX': offsetX, 'offsetY': offsetY, 'scale': scale};
+  Map<String, dynamic> toJson() => {
+    'offsetX': offsetX,
+    'offsetY': offsetY,
+    'scale': scale,
+  };
 
   static CanvasViewState fromJson(Map<String, dynamic> json) => CanvasViewState(
-        offsetX: (json['offsetX'] as num?)?.toDouble() ?? 0,
-        offsetY: (json['offsetY'] as num?)?.toDouble() ?? 0,
-        scale: (json['scale'] as num?)?.toDouble() ?? 1,
-      );
+    offsetX: (json['offsetX'] as num?)?.toDouble() ?? 0,
+    offsetY: (json['offsetY'] as num?)?.toDouble() ?? 0,
+    scale: (json['scale'] as num?)?.toDouble() ?? 1,
+  );
 }
 
 /// One canvas / tab: an ordered collection of elements plus its view state.
@@ -51,13 +54,12 @@ class CanvasDoc {
     String? name,
     List<CanvasElement>? elements,
     CanvasViewState? view,
-  }) =>
-      CanvasDoc(
-        id: id,
-        name: name ?? this.name,
-        elements: elements ?? this.elements,
-        view: view ?? this.view,
-      );
+  }) => CanvasDoc(
+    id: id,
+    name: name ?? this.name,
+    elements: elements ?? this.elements,
+    view: view ?? this.view,
+  );
 
   /// Returns a copy with [element] added or, if an element with the same id
   /// already exists, replaced in place.
@@ -76,20 +78,20 @@ class CanvasDoc {
       copyWith(elements: elements.where((e) => e.id != id).toList());
 
   Map<String, dynamic> toJson() => {
-        'id': id.value,
-        'name': name,
-        'view': view.toJson(),
-        'elements': elements.map((e) => e.toJson()).toList(),
-      };
+    'id': id.value,
+    'name': name,
+    'view': view.toJson(),
+    'elements': elements.map((e) => e.toJson()).toList(),
+  };
 
   static CanvasDoc fromJson(Map<String, dynamic> json) => CanvasDoc(
-        id: ElementId(json['id'] as String),
-        name: json['name'] as String? ?? 'Canvas',
-        view: json['view'] == null
-            ? const CanvasViewState()
-            : CanvasViewState.fromJson(json['view'] as Map<String, dynamic>),
-        elements: ((json['elements'] as List?) ?? const [])
-            .map((e) => CanvasElement.fromJson(e as Map<String, dynamic>))
-            .toList(),
-      );
+    id: ElementId(json['id'] as String),
+    name: json['name'] as String? ?? 'Canvas',
+    view: json['view'] == null
+        ? const CanvasViewState()
+        : CanvasViewState.fromJson(json['view'] as Map<String, dynamic>),
+    elements: ((json['elements'] as List?) ?? const [])
+        .map((e) => CanvasElement.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
 }

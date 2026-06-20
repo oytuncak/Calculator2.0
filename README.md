@@ -8,18 +8,23 @@ cascade.
 
 Built with **Flutter** (one codebase for iOS, Android, and web).
 
-## Status — Milestone 1 (foundation)
+## Status
 
+**Milestone 1 — foundation**
 - ✅ Infinite pan/zoom canvas with draggable elements
 - ✅ Equation elements with **live results** (`+ − × ÷ %`, parentheses, contextual percent)
 - ✅ **Linked / referenced numbers** — drag a result onto another equation to link it;
   edits cascade down the chain (cycles are isolated, not fatal)
 - ✅ Text note / label elements
-- ✅ Local persistence (`.calc2x` JSON document) + dark mode
-- ✅ Pure-Dart engine with full unit + widget test coverage
+- ✅ Local persistence (JSON document) + dark mode
 
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (Projects & tabs, Excel
-export, charts, scientific functions, and the AI / Claude-MCP layer).
+**Milestone 2 — structure & export**
+- ✅ **Projects** — multiple projects via a side drawer (create / switch / rename / delete)
+- ✅ **Tabs** — multiple canvases per project, with add / rename / delete
+- ✅ **Excel export** — export the current canvas to a formatted `.xlsx` (web download / device share)
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (charts, scientific
+functions, and the AI / Claude-MCP layer).
 
 ## Architecture
 

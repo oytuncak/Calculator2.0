@@ -58,38 +58,37 @@ class EquationElement extends CanvasElement {
     double? height,
     String? rawText,
     String? label,
-  }) =>
-      EquationElement(
-        id: id,
-        x: x ?? this.x,
-        y: y ?? this.y,
-        width: width ?? this.width,
-        height: height ?? this.height,
-        rawText: rawText ?? this.rawText,
-        label: label ?? this.label,
-      );
+  }) => EquationElement(
+    id: id,
+    x: x ?? this.x,
+    y: y ?? this.y,
+    width: width ?? this.width,
+    height: height ?? this.height,
+    rawText: rawText ?? this.rawText,
+    label: label ?? this.label,
+  );
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'equation',
-        'id': id.value,
-        'x': x,
-        'y': y,
-        'width': width,
-        'height': height,
-        'rawText': rawText,
-        if (label != null) 'label': label,
-      };
+    'type': 'equation',
+    'id': id.value,
+    'x': x,
+    'y': y,
+    'width': width,
+    'height': height,
+    'rawText': rawText,
+    if (label != null) 'label': label,
+  };
 
   static EquationElement fromJson(Map<String, dynamic> json) => EquationElement(
-        id: ElementId(json['id'] as String),
-        x: (json['x'] as num).toDouble(),
-        y: (json['y'] as num).toDouble(),
-        width: (json['width'] as num?)?.toDouble() ?? 220,
-        height: (json['height'] as num?)?.toDouble() ?? 56,
-        rawText: json['rawText'] as String? ?? '',
-        label: json['label'] as String?,
-      );
+    id: ElementId(json['id'] as String),
+    x: (json['x'] as num).toDouble(),
+    y: (json['y'] as num).toDouble(),
+    width: (json['width'] as num?)?.toDouble() ?? 220,
+    height: (json['height'] as num?)?.toDouble() ?? 56,
+    rawText: json['rawText'] as String? ?? '',
+    label: json['label'] as String?,
+  );
 }
 
 /// A free text note / title / label placed on the canvas.
@@ -117,39 +116,38 @@ class TextElement extends CanvasElement {
     String? text,
     double? fontSize,
     bool? bold,
-  }) =>
-      TextElement(
-        id: id,
-        x: x ?? this.x,
-        y: y ?? this.y,
-        width: width ?? this.width,
-        height: height ?? this.height,
-        text: text ?? this.text,
-        fontSize: fontSize ?? this.fontSize,
-        bold: bold ?? this.bold,
-      );
+  }) => TextElement(
+    id: id,
+    x: x ?? this.x,
+    y: y ?? this.y,
+    width: width ?? this.width,
+    height: height ?? this.height,
+    text: text ?? this.text,
+    fontSize: fontSize ?? this.fontSize,
+    bold: bold ?? this.bold,
+  );
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'text',
-        'id': id.value,
-        'x': x,
-        'y': y,
-        'width': width,
-        'height': height,
-        'text': text,
-        'fontSize': fontSize,
-        'bold': bold,
-      };
+    'type': 'text',
+    'id': id.value,
+    'x': x,
+    'y': y,
+    'width': width,
+    'height': height,
+    'text': text,
+    'fontSize': fontSize,
+    'bold': bold,
+  };
 
   static TextElement fromJson(Map<String, dynamic> json) => TextElement(
-        id: ElementId(json['id'] as String),
-        x: (json['x'] as num).toDouble(),
-        y: (json['y'] as num).toDouble(),
-        width: (json['width'] as num?)?.toDouble() ?? 240,
-        height: (json['height'] as num?)?.toDouble() ?? 48,
-        text: json['text'] as String? ?? '',
-        fontSize: (json['fontSize'] as num?)?.toDouble() ?? 18,
-        bold: json['bold'] as bool? ?? false,
-      );
+    id: ElementId(json['id'] as String),
+    x: (json['x'] as num).toDouble(),
+    y: (json['y'] as num).toDouble(),
+    width: (json['width'] as num?)?.toDouble() ?? 240,
+    height: (json['height'] as num?)?.toDouble() ?? 48,
+    text: json['text'] as String? ?? '',
+    fontSize: (json['fontSize'] as num?)?.toDouble() ?? 18,
+    bold: json['bold'] as bool? ?? false,
+  );
 }

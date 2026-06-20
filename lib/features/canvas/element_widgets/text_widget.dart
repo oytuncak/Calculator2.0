@@ -23,8 +23,9 @@ class TextNoteWidget extends ConsumerStatefulWidget {
 }
 
 class _TextNoteWidgetState extends ConsumerState<TextNoteWidget> {
-  late final TextEditingController _text =
-      TextEditingController(text: widget.element.text);
+  late final TextEditingController _text = TextEditingController(
+    text: widget.element.text,
+  );
   final _focus = FocusNode();
 
   @override
@@ -68,16 +69,21 @@ class _TextNoteWidgetState extends ConsumerState<TextNoteWidget> {
                 behavior: HitTestBehavior.opaque,
                 onPanUpdate: (d) {
                   final s = widget.scaleGetter();
-                  _controller.apply(MoveElement(
-                    widget.element.id,
-                    widget.element.x + d.delta.dx / s,
-                    widget.element.y + d.delta.dy / s,
-                  ));
+                  _controller.apply(
+                    MoveElement(
+                      widget.element.id,
+                      widget.element.x + d.delta.dx / s,
+                      widget.element.y + d.delta.dy / s,
+                    ),
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10, right: 4),
-                  child: Icon(Icons.drag_indicator,
-                      size: 16, color: scheme.onSurfaceVariant),
+                  child: Icon(
+                    Icons.drag_indicator,
+                    size: 16,
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
               ),
               Expanded(
@@ -87,8 +93,9 @@ class _TextNoteWidgetState extends ConsumerState<TextNoteWidget> {
                   maxLines: null,
                   style: TextStyle(
                     fontSize: widget.element.fontSize,
-                    fontWeight:
-                        widget.element.bold ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: widget.element.bold
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                   decoration: const InputDecoration(hintText: 'note…'),
                   onChanged: (t) =>
@@ -98,8 +105,11 @@ class _TextNoteWidgetState extends ConsumerState<TextNoteWidget> {
               InkWell(
                 onTap: () =>
                     _controller.apply(DeleteElement(widget.element.id)),
-                child: Icon(Icons.close,
-                    size: 14, color: scheme.onSurfaceVariant),
+                child: Icon(
+                  Icons.close,
+                  size: 14,
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

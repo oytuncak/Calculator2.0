@@ -23,14 +23,13 @@ class SettingsController extends StateNotifier<ThemeMode> {
     _prefs.setString(_themeKey, mode.name);
   }
 
-  void toggleDark() => setThemeMode(
-        state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
-      );
+  void toggleDark() =>
+      setThemeMode(state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
 }
 
 final settingsControllerProvider =
     StateNotifierProvider<SettingsController, ThemeMode>(
-  (ref) => throw UnimplementedError(
-    'settingsControllerProvider must be overridden in main()',
-  ),
-);
+      (ref) => throw UnimplementedError(
+        'settingsControllerProvider must be overridden in main()',
+      ),
+    );
