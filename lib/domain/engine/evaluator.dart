@@ -96,9 +96,15 @@ class Evaluator {
   double _resolveVariable(String name) {
     final constant = kConstants[name.toLowerCase()];
     if (constant != null) return constant;
-    // Named variables (references to labelled equations) arrive in a later
-    // milestone; for now an unknown bare identifier is an error.
-    throw EvalError(EvalErrorKind.unknownVariable, 'Unknown name "$name"');
+    final value = context.resolveVariable(name);
+    return switch (value) {
+      NumberValue(:final value) => value,
+      EmptyValue() => throw EvalError.referenceError('"$name" is empty'),
+      ErrorValue() => throw EvalError(
+        EvalErrorKind.unknownVariable,
+        'Unknown name "$name"',
+      ),
+    };
   }
 
   double _call(String name, List<Expr> args) {

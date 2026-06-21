@@ -115,6 +115,14 @@ class DocumentController extends StateNotifier<DocumentState> {
             ),
           );
         }
+      case NameEquation(:final id, :final name):
+        final existing = canvas.elementById(id);
+        if (existing is EquationElement) {
+          // Empty string means "no name" (the engine ignores blank labels).
+          _updateCanvas(
+            (c) => c.upsertElement(existing.copyWith(label: name.trim())),
+          );
+        }
       case DeleteElement(:final id):
         _updateCanvas((c) => c.removeElement(id), clearSelection: true);
       case CreateCanvas(:final name):

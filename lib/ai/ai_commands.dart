@@ -31,6 +31,13 @@ class EditElement extends DocumentCommand {
   final String rawText;
 }
 
+/// Sets an equation's name (label), so it can be referenced by name elsewhere.
+class NameEquation extends DocumentCommand {
+  const NameEquation(this.id, this.name);
+  final ElementId id;
+  final String name;
+}
+
 class MoveElement extends DocumentCommand {
   const MoveElement(this.id, this.x, this.y);
   final ElementId id;

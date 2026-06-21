@@ -33,10 +33,15 @@ isolation), text notes, basic arithmetic engine, `.calc2x` persistence, dark mod
   immediately (the recompute engine uses the standard registry).
 - Note: comma is now a function-argument separator (typed thousands separators dropped).
 
-## M4b — Named variables (next)
-- Reference a labelled equation by name (`subtotal * 2`) — resolves via `EvalContext`
-  + the dependency graph, with a small UI to name an equation.
-- Unit grammar groundwork for conversions.
+## ✅ M4b — Named variables (shipped)
+- Name an equation (the italic "name" field on each card) and reference it by name in
+  others (`subtotal * 1.2`). Names resolve through `EvalContext.resolveVariable`; the
+  recompute engine adds dependency edges so name edits cascade and name cycles are
+  isolated. Only plain identifiers (not reserved constants) are usable as names.
+
+## M5 — AI ("talk to the calculator")
+- Real `AiAssistant` + a Node/TS **MCP server** driving `DocumentCommand`s; natural-language
+  input, explain-steps, smart unit & **live currency** conversion, cleanup suggestions.
 
 ## M5 — AI ("talk to the calculator")
 The app already depends on the `AiAssistant` interface and mutates only through
