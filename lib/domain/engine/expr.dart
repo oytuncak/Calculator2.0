@@ -19,6 +19,20 @@ class Reference extends Expr {
   final String elementId;
 }
 
+/// A bare identifier: a constant (`pi`, `e`) or a named variable (resolved by
+/// the [EvalContext]).
+class VariableRef extends Expr {
+  const VariableRef(this.name);
+  final String name;
+}
+
+/// A function call such as `sin(x)` or `max(a, b)`.
+class FunctionCall extends Expr {
+  const FunctionCall(this.name, this.args);
+  final String name;
+  final List<Expr> args;
+}
+
 class Grouping extends Expr {
   const Grouping(this.inner);
   final Expr inner;
@@ -33,7 +47,7 @@ class UnaryOp extends Expr {
   final Expr operand;
 }
 
-enum BinaryOperator { add, subtract, multiply, divide }
+enum BinaryOperator { add, subtract, multiply, divide, power }
 
 class BinaryOp extends Expr {
   const BinaryOp(this.op, this.left, this.right);

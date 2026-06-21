@@ -27,8 +27,12 @@ Built with **Flutter** (one codebase for iOS, Android, and web).
 - ✅ **Chart elements** — bar / line / pie charts on the canvas; drop an equation's
   result onto a chart to add it as a series, and the chart **updates live** as values cascade
 
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (scientific functions &
-variables, then the AI / Claude-MCP layer).
+**Milestone 4 — scientific functions**
+- ✅ **Functions** (`sin`, `cos`, `sqrt`, `ln`, `log`, `min`/`max`, `pow`, …), **constants**
+  (`pi`, `e`, `tau`), and the **`^` exponent** operator — usable directly in any equation
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (named variables, then the
+AI / Claude-MCP layer).
 
 ## Architecture
 

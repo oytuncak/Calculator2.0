@@ -1,7 +1,10 @@
+import 'dart:math' as math;
+
 import '../model/cell_value.dart';
 import 'eval_context.dart';
 import 'eval_error.dart';
 import 'expr.dart';
+import 'function_registry.dart';
 import 'parser.dart';
 
 /// Parses and evaluates [source] in one step, returning any parse or eval
@@ -23,9 +26,11 @@ CellValue evaluateSource(
 /// Throws are caught internally and surfaced as [ErrorValue] so a single bad
 /// cell never breaks the rest of the document.
 class Evaluator {
-  const Evaluator(this.context);
+  Evaluator(this.context, {FunctionRegistry? registry})
+    : registry = registry ?? FunctionRegistry.standard;
 
   final EvalContext context;
+  final FunctionRegistry registry;
 
   CellValue evaluate(Expr expr) {
     try {
@@ -43,6 +48,10 @@ class Evaluator {
         return _eval(inner);
       case Reference(:final elementId):
         return _resolve(elementId);
+      case VariableRef(:final name):
+        return _resolveVariable(name);
+      case FunctionCall(:final name, :final args):
+        return _call(name, args);
       case UnaryOp(:final op, :final operand):
         final v = _eval(operand);
         return switch (op) {
@@ -61,13 +70,16 @@ class Evaluator {
     // relative to the left operand (standard calculator behaviour):
     //   100 + 20%  -> 120     100 - 20%  -> 80
     //   100 * 20%  -> 20      100 / 50%  -> 200
-    if (right is UnaryOp && right.op == UnaryOperator.percent) {
+    if (op != BinaryOperator.power &&
+        right is UnaryOp &&
+        right.op == UnaryOperator.percent) {
       final pct = _eval(right.operand) / 100.0;
       return switch (op) {
         BinaryOperator.add => l + l * pct,
         BinaryOperator.subtract => l - l * pct,
         BinaryOperator.multiply => l * pct,
         BinaryOperator.divide => _guardDivide(l, pct),
+        BinaryOperator.power => l, // unreachable (guarded above)
       };
     }
 
@@ -77,7 +89,33 @@ class Evaluator {
       BinaryOperator.subtract => l - r,
       BinaryOperator.multiply => l * r,
       BinaryOperator.divide => _guardDivide(l, r),
+      BinaryOperator.power => math.pow(l, r).toDouble(),
     };
+  }
+
+  double _resolveVariable(String name) {
+    final constant = kConstants[name.toLowerCase()];
+    if (constant != null) return constant;
+    // Named variables (references to labelled equations) arrive in a later
+    // milestone; for now an unknown bare identifier is an error.
+    throw EvalError(EvalErrorKind.unknownVariable, 'Unknown name "$name"');
+  }
+
+  double _call(String name, List<Expr> args) {
+    final fn = registry.lookup(name);
+    if (fn == null) {
+      throw EvalError(
+        EvalErrorKind.unknownFunction,
+        'Unknown function "$name"',
+      );
+    }
+    if (!fn.acceptsArity(args.length)) {
+      throw EvalError(
+        EvalErrorKind.arity,
+        '"$name" got ${args.length} argument(s)',
+      );
+    }
+    return fn.apply(args.map(_eval).toList());
   }
 
   double _guardDivide(double a, double b) {

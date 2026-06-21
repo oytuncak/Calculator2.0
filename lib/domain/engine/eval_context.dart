@@ -31,6 +31,7 @@ Set<String> collectReferences(Expr expr) {
   void visit(Expr e) {
     switch (e) {
       case NumberLiteral():
+      case VariableRef():
         break;
       case Reference(:final elementId):
         ids.add(elementId);
@@ -41,6 +42,10 @@ Set<String> collectReferences(Expr expr) {
       case BinaryOp(:final left, :final right):
         visit(left);
         visit(right);
+      case FunctionCall(:final args):
+        for (final a in args) {
+          visit(a);
+        }
     }
   }
 

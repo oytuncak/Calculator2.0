@@ -63,7 +63,17 @@ class Parser {
     if (_match(TokenType.minus)) {
       return UnaryOp(UnaryOperator.negate, _unary());
     }
-    return _postfix();
+    return _power();
+  }
+
+  // Right-associative exponent: 2^3^2 == 2^(3^2); right side allows a unary so
+  // 2^-3 parses.
+  Expr _power() {
+    final base = _postfix();
+    if (_match(TokenType.caret)) {
+      return BinaryOp(BinaryOperator.power, base, _unary());
+    }
+    return base;
   }
 
   Expr _postfix() {
@@ -83,6 +93,20 @@ class Parser {
       case TokenType.reference:
         _advance();
         return Reference(token.refId!);
+      case TokenType.identifier:
+        _advance();
+        if (_match(TokenType.lparen)) {
+          final args = <Expr>[];
+          if (_peek().type != TokenType.rparen) {
+            args.add(_expression());
+            while (_match(TokenType.comma)) {
+              args.add(_expression());
+            }
+          }
+          _expect(TokenType.rparen, 'Expected ")"');
+          return FunctionCall(token.lexeme, args);
+        }
+        return VariableRef(token.lexeme);
       case TokenType.lparen:
         _advance();
         final inner = _expression();
