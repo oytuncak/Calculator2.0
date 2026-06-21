@@ -5,6 +5,7 @@ import '../../data/export/file_export_service.dart';
 import '../../data/export/xlsx_exporter.dart';
 import '../../state/document_controller.dart';
 import '../../state/settings_controller.dart';
+import '../ai/ai_ask_dialog.dart';
 import '../projects/projects_drawer.dart';
 import 'canvas_tab_bar.dart';
 import 'canvas_view.dart';
@@ -45,6 +46,11 @@ class CanvasScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Ask AI',
+            icon: const Icon(Icons.auto_awesome),
+            onPressed: () => AiAskDialog.show(context),
+          ),
           IconButton(
             tooltip: 'Export to Excel',
             icon: const Icon(Icons.table_view),
@@ -94,7 +100,7 @@ class CanvasScreen extends ConsumerWidget {
     showAboutDialog(
       context: context,
       applicationName: 'Calculator 2.0',
-      applicationVersion: 'Milestone 2',
+      applicationVersion: 'Milestone 5 — AI',
       applicationLegalese: 'Developed by Gastronaut',
       children: const [
         SizedBox(height: 12),

@@ -33,7 +33,12 @@ Built with **Flutter** (one codebase for iOS, Android, and web).
 - ✅ **Named variables** — name an equation (e.g. `subtotal`) and reference it by name in
   others (`subtotal * 1.2`); edits cascade like links, cycles are isolated
 
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (the AI / Claude-MCP layer).
+**Milestone 5 — AI**
+- ✅ **Natural-language input** (✨ Ask AI) — describe a calculation in plain English and it
+  becomes a live equation. **Bring-your-own-key**: paste your Anthropic API key (stored
+  locally); the app calls Claude directly.
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's next (explain-steps, live currency, MCP server).
 
 ## Architecture
 

@@ -45,6 +45,8 @@ dependencies:
   file_saver: ^0.2.14
   # Pure-Dart charts for canvas chart elements (live-updating).
   fl_chart: ^0.69.2
+  # HTTP client for calling the Anthropic API (bring-your-own-key AI).
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
