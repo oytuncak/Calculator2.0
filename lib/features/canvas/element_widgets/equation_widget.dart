@@ -35,6 +35,10 @@ class _EquationWidgetState extends ConsumerState<EquationWidget> {
     text: widget.element.rawText,
   );
   final _focus = FocusNode();
+  late final TextEditingController _name = TextEditingController(
+    text: widget.element.label ?? '',
+  );
+  final _nameFocus = FocusNode();
 
   @override
   void didUpdateWidget(EquationWidget old) {
@@ -44,12 +48,18 @@ class _EquationWidgetState extends ConsumerState<EquationWidget> {
     if (widget.element.rawText != _text.text && !_focus.hasFocus) {
       _text.text = widget.element.rawText;
     }
+    final label = widget.element.label ?? '';
+    if (label != _name.text && !_nameFocus.hasFocus) {
+      _name.text = label;
+    }
   }
 
   @override
   void dispose() {
     _text.dispose();
     _focus.dispose();
+    _name.dispose();
+    _nameFocus.dispose();
     super.dispose();
   }
 
@@ -134,7 +144,30 @@ class _EquationWidgetState extends ConsumerState<EquationWidget> {
             color: scheme.onSurfaceVariant,
           ),
         ),
-        const Spacer(),
+        const SizedBox(width: 4),
+        // Optional name: reference this result by name in other equations.
+        Expanded(
+          child: TextField(
+            controller: _name,
+            focusNode: _nameFocus,
+            style: TextStyle(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: scheme.primary,
+            ),
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: 'name',
+              hintStyle: TextStyle(
+                fontSize: 12,
+                color: scheme.onSurfaceVariant.withValues(alpha: 0.6),
+              ),
+              contentPadding: EdgeInsets.zero,
+            ),
+            onChanged: (t) =>
+                _controller.apply(NameEquation(widget.element.id, t)),
+          ),
+        ),
         InkWell(
           onTap: () => _controller.apply(DeleteElement(widget.element.id)),
           child: Icon(Icons.close, size: 16, color: scheme.onSurfaceVariant),
