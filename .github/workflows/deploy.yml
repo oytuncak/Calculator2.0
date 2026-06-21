@@ -36,7 +36,12 @@ jobs:
       # base-href must match the repo name so assets resolve under
       # https://<owner>.github.io/Calculator2.0/
       - name: Build web
-        run: flutter build web --release --base-href "/Calculator2.0/"
+        # --pwa-strategy=none: do not generate/register a service worker, so
+        # redeploys are never masked by a stale cache.
+        run: flutter build web --release --base-href "/Calculator2.0/" --pwa-strategy=none
+
+      - name: Remove any service worker (belt and braces)
+        run: rm -f build/web/flutter_service_worker.js
 
       - uses: actions/configure-pages@v5
         with:
