@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app/app.dart';
 import 'data/repository/workspace_repository.dart';
 import 'domain/serialization/workspace_codec.dart';
+import 'state/ai_controller.dart';
 import 'state/document_controller.dart';
 import 'state/settings_controller.dart';
 
@@ -27,6 +28,7 @@ Future<void> main() async {
         settingsControllerProvider.overrideWith(
           (ref) => SettingsController(prefs),
         ),
+        aiSettingsProvider.overrideWith((ref) => AiSettingsController(prefs)),
       ],
       child: const Calculator2App(),
     ),

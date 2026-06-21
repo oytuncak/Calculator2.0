@@ -39,9 +39,17 @@ isolation), text notes, basic arithmetic engine, `.calc2x` persistence, dark mod
   recompute engine adds dependency edges so name edits cascade and name cycles are
   isolated. Only plain identifiers (not reserved constants) are usable as names.
 
-## M5 — AI ("talk to the calculator")
-- Real `AiAssistant` + a Node/TS **MCP server** driving `DocumentCommand`s; natural-language
-  input, explain-steps, smart unit & **live currency** conversion, cleanup suggestions.
+## ✅ M5a — Natural-language input (shipped)
+- **Ask AI** (✨ in the app bar): describe a calculation in plain English and it becomes a
+  live equation on the canvas. **Bring-your-own-key** — the user pastes their Anthropic API
+  key (stored locally); the app calls Claude directly (browser-access header for web).
+- `ClaudeAiAssistant` implements the `AiAssistant` seam; swapped in via `aiAssistantProvider`
+  when a key is present (else `NullAiAssistant`).
+
+## M5b+ — More AI (next)
+- Explain / show-steps for a result; smart unit & **live currency** conversion (rates API);
+  cleanup suggestions; and a Node/TS **MCP server** driving `DocumentCommand`s so Claude can
+  fully "talk to the calculator".
 
 ## M5 — AI ("talk to the calculator")
 The app already depends on the `AiAssistant` interface and mutates only through
