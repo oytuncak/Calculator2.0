@@ -6,8 +6,13 @@ enum TokenType {
   star,
   slash,
   percent,
+  caret,
   lparen,
   rparen,
+  comma,
+
+  /// A function name or constant, e.g. `sin`, `sqrt`, `pi`.
+  identifier,
 
   /// A reference to another element's result, written as `@<elementId>`.
   reference,

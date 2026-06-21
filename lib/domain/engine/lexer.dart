@@ -38,15 +38,21 @@ class Lexer {
           tokens.add(_single(TokenType.slash, '/', start));
         case '%':
           tokens.add(_single(TokenType.percent, '%', start));
+        case '^':
+          tokens.add(_single(TokenType.caret, '^', start));
         case '(':
           tokens.add(_single(TokenType.lparen, '(', start));
         case ')':
           tokens.add(_single(TokenType.rparen, ')', start));
+        case ',':
+          tokens.add(_single(TokenType.comma, ',', start));
         case '@':
           tokens.add(_reference(start));
         default:
           if (_isDigit(c) || c == '.') {
             tokens.add(_number(start));
+          } else if (_isLetter(c) || c == '_') {
+            tokens.add(_identifier(start));
           } else {
             throw EvalError.syntax('Unexpected character "$c"');
           }
@@ -80,6 +86,20 @@ class Lexer {
     return Token(TokenType.reference, '@$id', start, refId: id);
   }
 
+  Token _identifier(int start) {
+    final buf = StringBuffer();
+    while (!_isAtEnd) {
+      final c = _peek();
+      if (_isLetter(c) || _isDigit(c) || c == '_') {
+        buf.write(c);
+        _pos++;
+      } else {
+        break;
+      }
+    }
+    return Token(TokenType.identifier, buf.toString(), start);
+  }
+
   Token _number(int start) {
     final buf = StringBuffer();
     var seenDot = false;
@@ -92,9 +112,6 @@ class Lexer {
         if (seenDot) break;
         seenDot = true;
         buf.write(c);
-        _pos++;
-      } else if (c == ',') {
-        // Thousands separator: ignore so "1,000" parses as 1000.
         _pos++;
       } else {
         break;

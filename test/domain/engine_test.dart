@@ -28,10 +28,16 @@ void main() {
       expect(number('2 * -3'), -6);
     });
 
-    test('decimals and thousands separators', () {
+    test('decimals', () {
       expect(number('1.5 + 2.5'), 4);
-      expect(number('1,000 + 1,000'), 2000);
       expect(number('.5 * 2'), 1);
+    });
+
+    test('exponent operator (right-associative)', () {
+      expect(number('2 ^ 3'), 8);
+      expect(number('2 ^ 3 ^ 2'), 512); // 2^(3^2)
+      expect(number('-2 ^ 2'), -4); // -(2^2)
+      expect(number('2 ^ -1'), 0.5);
     });
 
     test('typographic operators', () {

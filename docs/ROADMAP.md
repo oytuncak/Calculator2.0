@@ -25,9 +25,17 @@ isolation), text notes, basic arithmetic engine, `.calc2x` persistence, dark mod
 - _Next for charts_: per-series labels/legend, axis ranges, and exporting charts
   into the `.xlsx` (currently visual-only).
 
-## M4 — Engine extension
-- Named **variables** and **scientific functions** (`sin`, `cos`, `sqrt`, `^`, …)
-  via the `FunctionRegistry` + `EvalContext` seams — no parser surgery required.
+## ✅ M4a — Scientific functions (shipped)
+- **Functions** (`sin`/`cos`/`tan`, `asin`…/`sinh`…, `sqrt`/`cbrt`, `ln`/`log`/`log10`,
+  `exp`, `abs`/`round`/`floor`/`ceil`, `min`/`max`/`avg`/`sum`, `pow`/`root`/`mod`/`hypot`,
+  `rad`/`deg`), **constants** (`pi`, `e`, `tau`), and the **`^` exponent** operator —
+  all via the `FunctionRegistry` + lexer-identifier seam. They work in any equation
+  immediately (the recompute engine uses the standard registry).
+- Note: comma is now a function-argument separator (typed thousands separators dropped).
+
+## M4b — Named variables (next)
+- Reference a labelled equation by name (`subtotal * 2`) — resolves via `EvalContext`
+  + the dependency graph, with a small UI to name an equation.
 - Unit grammar groundwork for conversions.
 
 ## M5 — AI ("talk to the calculator")

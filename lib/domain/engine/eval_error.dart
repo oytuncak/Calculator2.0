@@ -21,6 +21,15 @@ enum EvalErrorKind {
   /// Adding this reference would create a cycle in the dependency graph.
   circularReference,
 
+  /// A call to a function that is not registered.
+  unknownFunction,
+
+  /// A bare identifier that is neither a constant nor a known variable.
+  unknownVariable,
+
+  /// A function called with the wrong number of arguments.
+  arity,
+
   /// A numeric result that is not finite (e.g. overflow, 0/0).
   notANumber,
 }
